@@ -1,0 +1,1353 @@
+{% extends "base.html" %} {% block title %}Search - BirdTag{% endblock %} {%
+block content %}
+<div class="max-w-7xl mx-auto px-6 py-8">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center space-x-4">
+      <a
+        href="{{ url_for('dashboard') }}"
+        class="text-gray-500 hover:text-gray-700"
+      >
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+      </a>
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Search Collection</h1>
+        <p class="text-gray-600">
+          Advanced search and management tools for your bird media collection
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Interface -->
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+    <!-- Search Filters Sidebar -->
+    <div class="lg:col-span-1 space-y-6">
+      <!-- Search Type Tabs -->
+      <div class="glass-effect rounded-xl p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Search Type</h3>
+        <div class="space-y-2">
+          <button
+            onclick="switchSearchType('species')"
+            class="search-type-btn active w-full text-left px-4 py-3 rounded-lg font-medium transition-colors duration-200"
+            data-type="species"
+          >
+            <i data-lucide="bird" class="w-4 h-4 inline mr-2"></i>
+            Species Search
+          </button>
+          <button
+            onclick="switchSearchType('tags')"
+            class="search-type-btn w-full text-left px-4 py-3 rounded-lg font-medium transition-colors duration-200"
+            data-type="tags"
+          >
+            <i data-lucide="tag" class="w-4 h-4 inline mr-2"></i>
+            Tag Count Search
+          </button>
+          <button
+            onclick="switchSearchType('thumbnail')"
+            class="search-type-btn w-full text-left px-4 py-3 rounded-lg font-medium transition-colors duration-200"
+            data-type="thumbnail"
+          >
+            <i data-lucide="image" class="w-4 h-4 inline mr-2"></i>
+            Thumbnail URL Search
+          </button>
+          <button
+            onclick="switchSearchType('file')"
+            class="search-type-btn w-full text-left px-4 py-3 rounded-lg font-medium transition-colors duration-200"
+            data-type="file"
+          >
+            <i data-lucide="upload" class="w-4 h-4 inline mr-2"></i>
+            File-based Search
+          </button>
+        </div>
+      </div>
+
+      <!-- Species Search -->
+      <div id="species-search" class="search-panel glass-effect rounded-xl p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Species Search</h3>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Bird Species</label
+            >
+            <input
+              type="text"
+              id="speciesInput"
+              placeholder="e.g., crow, pigeon, cardinal"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-bird-500 focus:border-transparent"
+            />
+            <p class="text-xs text-gray-500 mt-1">
+              Separate multiple species with commas
+            </p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >File Type</label
+            >
+            <select
+              id="speciesFileType"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-bird-500 focus:border-transparent"
+            >
+              <option value="">All Types</option>
+              <option value="image">Images</option>
+              <option value="video">Videos</option>
+              <option value="audio">Audio</option>
+            </select>
+          </div>
+          <button
+            onclick="performSpeciesSearch()"
+            class="w-full bird-gradient text-white py-2 px-4 rounded-lg font-medium hover:opacity-90 transition-all duration-200"
+          >
+            Search by Species
+          </button>
+        </div>
+      </div>
+
+      <!-- Tag Count Search -->
+      <div
+        id="tags-search"
+        class="search-panel glass-effect rounded-xl p-6 hidden"
+      >
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+          Tag Count Search
+        </h3>
+        <div class="space-y-4">
+          <div id="tagInputs">
+            <div class="tag-input-row flex space-x-2 mb-2">
+              <input
+                type="text"
+                placeholder="Species name"
+                class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-bird-500 focus:border-transparent"
+              />
+              <input
+                type="number"
+                placeholder="Min count"
+                min="1"
+                value="1"
+                class="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-bird-500 focus:border-transparent"
+              />
+              <button
+                onclick="removeTagInput(this)"
+                class="text-red-500 hover:text-red-700 p-2"
+              >
+                <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+          <button
+            onclick="addTagInput()"
+            class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg transition-colors duration-200"
+          >
+            <i data-lucide="plus" class="w-4 h-4 inline mr-2"></i>
+            Add Tag Condition
+          </button>
+          <button
+            onclick="performTagCountSearch()"
+            class="w-full bird-gradient text-white py-2 px-4 rounded-lg font-medium hover:opacity-90 transition-all duration-200"
+          >
+            Search by Tag Counts
+          </button>
+        </div>
+      </div>
+
+      <!-- Thumbnail URL Search -->
+      <div
+        id="thumbnail-search"
+        class="search-panel glass-effect rounded-xl p-6 hidden"
+      >
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+          Thumbnail URL Search
+        </h3>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Thumbnail S3 URL</label
+            >
+            <input
+              type="url"
+              id="thumbnailUrl"
+              placeholder="https://xxx.s3.amazonaws.com/bird1-thumb.png"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-bird-500 focus:border-transparent"
+            />
+            <p class="text-xs text-gray-500 mt-1">
+              Enter the S3 URL of a thumbnail to get the full-size image
+            </p>
+          </div>
+          <button
+            onclick="performThumbnailSearch()"
+            class="w-full bird-gradient text-white py-2 px-4 rounded-lg font-medium hover:opacity-90 transition-all duration-200"
+          >
+            Get Full-Size Image
+          </button>
+        </div>
+      </div>
+
+      <!-- File-based Search -->
+      <div
+        id="file-search"
+        class="search-panel glass-effect rounded-xl p-6 hidden"
+      >
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+          File-based Search
+        </h3>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >Upload File for Analysis</label
+            >
+            <div
+              class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-bird-400 transition-colors duration-200"
+            >
+              <i
+                data-lucide="upload"
+                class="w-8 h-8 text-gray-400 mx-auto mb-2"
+              ></i>
+              <p class="text-sm text-gray-600 mb-2">
+                Drop file here or click to browse
+              </p>
+              <input
+                type="file"
+                id="searchFile"
+                class="hidden"
+                accept="image/*,video/*,audio/*"
+              />
+              <button
+                onclick="document.getElementById('searchFile').click()"
+                class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm"
+              >
+                Choose File
+              </button>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">
+              File will be analyzed but not stored
+            </p>
+          </div>
+          <div id="selectedFile" class="hidden">
+            <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+              <i data-lucide="file" class="w-5 h-5 text-gray-500"></i>
+              <span
+                id="fileName"
+                class="text-sm font-medium text-gray-900"
+              ></span>
+              <button
+                onclick="clearSelectedFile()"
+                class="text-red-500 hover:text-red-700 ml-auto"
+              >
+                <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+          <button
+            onclick="performFileBasedSearch()"
+            class="w-full bird-gradient text-white py-2 px-4 rounded-lg font-medium hover:opacity-90 transition-all duration-200"
+          >
+            Find Similar Files
+          </button>
+        </div>
+      </div>
+
+      <!-- Bulk Management Tools -->
+      <div class="glass-effect rounded-xl p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+          Bulk Management
+        </h3>
+        <div class="space-y-3">
+          <button
+            onclick="showBulkTagModal()"
+            class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
+          >
+            <i data-lucide="tag" class="w-4 h-4"></i>
+            <span>Manage Tags</span>
+          </button>
+          <button
+            onclick="downloadSelected()"
+            class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
+          >
+            <i data-lucide="download" class="w-4 h-4"></i>
+            <span>Download Selected</span>
+          </button>
+          <button
+            onclick="deleteSelected()"
+            class="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
+          >
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+            <span>Delete Selected</span>
+          </button>
+        </div>
+        <div class="mt-4 text-sm text-gray-600">
+          <span id="selectedCount">0</span> files selected
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Results -->
+    <div class="lg:col-span-3 space-y-6">
+      <!-- Search Status -->
+      <div id="searchStatus" class="glass-effect rounded-xl p-4 hidden">
+        <div class="flex items-center space-x-3">
+          <div class="animate-spin">
+            <i data-lucide="loader" class="w-5 h-5 text-bird-600"></i>
+          </div>
+          <span class="text-gray-700">Searching...</span>
+        </div>
+      </div>
+
+      <!-- Results Header -->
+      <div id="resultsHeader" class="flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Search Results</h3>
+          <p class="text-gray-600" id="resultsCount">
+            Enter search criteria to find files
+          </p>
+        </div>
+        <div class="flex items-center space-x-4">
+          <select
+            id="sortBy"
+            class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-bird-500 focus:border-transparent"
+          >
+            <option value="date">Sort by Date</option>
+            <option value="species">Sort by Species</option>
+            <option value="size">Sort by Size</option>
+            <option value="confidence">Sort by Confidence</option>
+          </select>
+          <div class="flex items-center space-x-2">
+            <button
+              id="gridView"
+              onclick="setView('grid')"
+              class="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 bg-bird-50 border-bird-300"
+            >
+              <i data-lucide="grid" class="w-4 h-4 text-bird-600"></i>
+            </button>
+            <button
+              id="listView"
+              onclick="setView('list')"
+              class="p-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+            >
+              <i data-lucide="list" class="w-4 h-4 text-gray-500"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results Grid -->
+      <div
+        id="resultsContainer"
+        class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+        data-view="grid"
+      >
+        <!-- Default empty state -->
+        <div class="col-span-full text-center py-12 text-gray-500">
+          <i
+            data-lucide="search"
+            class="w-16 h-16 mx-auto mb-4 text-gray-300"
+          ></i>
+          <p class="text-lg font-medium">No search performed yet</p>
+          <p class="text-sm">
+            Use the search tools on the left to find your bird media
+          </p>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div id="pagination" class="hidden flex items-center justify-between">
+        <p class="text-sm text-gray-600">
+          Showing <span id="showingStart">1</span>-<span id="showingEnd"
+            >24</span
+          >
+          of <span id="totalResults">0</span> results
+        </p>
+        <div class="flex items-center space-x-2">
+          <button
+            id="prevPage"
+            onclick="changePage(-1)"
+            class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+            disabled
+          >
+            Previous
+          </button>
+          <div id="pageNumbers" class="flex items-center space-x-1"></div>
+          <button
+            id="nextPage"
+            onclick="changePage(1)"
+            class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk Tag Management Modal -->
+<div
+  id="bulkTagModal"
+  class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+>
+  <div class="bg-white rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-semibold text-gray-900">Bulk Tag Management</h3>
+        <button
+          onclick="hideBulkTagModal()"
+          class="text-gray-500 hover:text-gray-700"
+        >
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="bulkTagForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Operation</label
+          >
+          <select
+            id="tagOperation"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-bird-500 focus:border-transparent"
+          >
+            <option value="1">Add Tags</option>
+            <option value="0">Remove Tags</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Tags to Add/Remove</label
+          >
+          <div id="bulkTagInputs">
+            <div class="bulk-tag-row flex space-x-2 mb-2">
+              <input
+                type="text"
+                placeholder="Species name"
+                class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-bird-500 focus:border-transparent"
+              />
+              <input
+                type="number"
+                placeholder="Count"
+                min="1"
+                value="1"
+                class="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-bird-500 focus:border-transparent"
+              />
+              <button
+                type="button"
+                onclick="removeBulkTagInput(this)"
+                class="text-red-500 hover:text-red-700 p-2"
+              >
+                <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+          <button
+            type="button"
+            onclick="addBulkTagInput()"
+            class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg transition-colors duration-200"
+          >
+            <i data-lucide="plus" class="w-4 h-4 inline mr-2"></i>
+            Add Tag
+          </button>
+        </div>
+
+        <div class="pt-4">
+          <p class="text-sm text-gray-600 mb-4">
+            This will affect <span id="affectedFiles">0</span> selected files
+          </p>
+          <div class="flex space-x-3">
+            <button
+              type="button"
+              onclick="hideBulkTagModal()"
+              class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg transition-colors duration-200"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="flex-1 bird-gradient text-white py-2 px-4 rounded-lg hover:opacity-90 transition-all duration-200"
+            >
+              Apply Changes
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Image Preview Modal -->
+<div
+  id="imageModal"
+  class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+>
+  <div class="relative max-w-4xl max-h-full">
+    <button
+      onclick="hideImageModal()"
+      class="absolute top-4 right-4 text-white hover:text-gray-300 z-10"
+    >
+      <i data-lucide="x" class="w-8 h-8"></i>
+    </button>
+    <img
+      id="modalImage"
+      src=""
+      alt=""
+      class="max-w-full max-h-full rounded-lg"
+    />
+    <div
+      class="absolute bottom-4 left-4 right-4 bg-black bg-opacity-50 text-white p-4 rounded-lg"
+    >
+      <p id="modalImageInfo" class="text-sm"></p>
+      <div class="mt-2 flex space-x-2">
+        <button
+          onclick="downloadFullImage()"
+          class="bg-bird-500 hover:bg-bird-600 px-4 py-2 rounded text-sm"
+        >
+          Download Full Size
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Global variables
+  let currentSearchResults = [];
+  let selectedFiles = new Set();
+  let currentPage = 1;
+  let itemsPerPage = 24;
+  let currentView = "grid";
+
+  // Search API endpoints configuration
+  const API_BASE = "/api";
+  const ENDPOINTS = {
+    species: `${API_BASE}/search/species`,
+    tags: `${API_BASE}/search/tags`,
+    thumbnail: `${API_BASE}/search/thumbnail`,
+    file: `${API_BASE}/search/file`,
+    bulkTag: `${API_BASE}/tags/bulk`,
+    delete: `${API_BASE}/files/delete`,
+  };
+
+  // Initialize page
+  document.addEventListener("DOMContentLoaded", function () {
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Setup file input handler
+    document
+      .getElementById("searchFile")
+      .addEventListener("change", handleFileSelection);
+
+    // Setup bulk tag form handler
+    document
+      .getElementById("bulkTagForm")
+      .addEventListener("submit", handleBulkTagSubmit);
+
+    // Setup sort change handler
+    document
+      .getElementById("sortBy")
+      .addEventListener("change", handleSortChange);
+
+    // Initialize active search type
+    switchSearchType("species");
+  });
+
+  // Search type switching
+  function switchSearchType(type) {
+    // Update button states
+    document.querySelectorAll(".search-type-btn").forEach((btn) => {
+      btn.classList.remove("active", "bird-gradient", "text-white");
+      btn.classList.add("bg-gray-100", "text-gray-700", "hover:bg-gray-200");
+    });
+
+    document
+      .querySelector(`[data-type="${type}"]`)
+      .classList.add("active", "bird-gradient", "text-white");
+    document
+      .querySelector(`[data-type="${type}"]`)
+      .classList.remove("bg-gray-100", "text-gray-700", "hover:bg-gray-200");
+
+    // Show/hide search panels
+    document
+      .querySelectorAll(".search-panel")
+      .forEach((panel) => panel.classList.add("hidden"));
+    document.getElementById(`${type}-search`).classList.remove("hidden");
+  }
+
+  // Species search
+  async function performSpeciesSearch() {
+    const species = document.getElementById("speciesInput").value.trim();
+    const fileType = document.getElementById("speciesFileType").value;
+
+    if (!species) {
+      alert("Please enter at least one species name");
+      return;
+    }
+
+    showSearchStatus();
+
+    try {
+      const speciesList = species
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s);
+      const params = new URLSearchParams();
+
+      speciesList.forEach((sp, index) => {
+        params.append(`species${index + 1}`, sp);
+      });
+
+      if (fileType) {
+        params.append("fileType", fileType);
+      }
+
+      const response = await fetch(`${ENDPOINTS.species}?${params}`);
+      const data = await response.json();
+
+      if (data.success) {
+        displaySearchResults(
+          data.results,
+          `Found ${data.results.length} files containing: ${speciesList.join(
+            ", "
+          )}`
+        );
+      } else {
+        showError(data.error || "Search failed");
+      }
+    } catch (error) {
+      console.error("Species search error:", error);
+      showError("Search request failed");
+    } finally {
+      hideSearchStatus();
+    }
+  }
+
+  // Tag count search
+  async function performTagCountSearch() {
+    const tagInputs = document.querySelectorAll("#tagInputs .tag-input-row");
+    const tagConditions = {};
+
+    for (let row of tagInputs) {
+      const species = row.querySelector('input[type="text"]').value.trim();
+      const count =
+        parseInt(row.querySelector('input[type="number"]').value) || 1;
+
+      if (species) {
+        tagConditions[species] = count;
+      }
+    }
+
+    if (Object.keys(tagConditions).length === 0) {
+      alert("Please add at least one tag condition");
+      return;
+    }
+
+    showSearchStatus();
+
+    try {
+      const response = await fetch(ENDPOINTS.tags, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(tagConditions),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        const conditionsText = Object.entries(tagConditions)
+          .map(([species, count]) => `≥${count} ${species}`)
+          .join(" AND ");
+        displaySearchResults(
+          data.results,
+          `Found ${data.results.length} files with: ${conditionsText}`
+        );
+      } else {
+        showError(data.error || "Tag search failed");
+      }
+    } catch (error) {
+      console.error("Tag count search error:", error);
+      showError("Search request failed");
+    } finally {
+      hideSearchStatus();
+    }
+  }
+
+  // Thumbnail search
+  async function performThumbnailSearch() {
+    const thumbnailUrl = document.getElementById("thumbnailUrl").value.trim();
+
+    if (!thumbnailUrl) {
+      alert("Please enter a thumbnail URL");
+      return;
+    }
+
+    showSearchStatus();
+
+    try {
+      const response = await fetch(ENDPOINTS.thumbnail, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ thumbnailUrl }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Show full-size image
+        showFullSizeImage(data.fullSizeUrl, thumbnailUrl);
+      } else {
+        showError(data.error || "Thumbnail search failed");
+      }
+    } catch (error) {
+      console.error("Thumbnail search error:", error);
+      showError("Search request failed");
+    } finally {
+      hideSearchStatus();
+    }
+  }
+
+  // File-based search
+  async function performFileBasedSearch() {
+    const fileInput = document.getElementById("searchFile");
+
+    if (!fileInput.files[0]) {
+      alert("Please select a file to analyze");
+      return;
+    }
+
+    showSearchStatus();
+
+    try {
+      const formData = new FormData();
+      formData.append("file", fileInput.files[0]);
+
+      const response = await fetch(ENDPOINTS.file, {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        const detectedSpecies = data.detectedTags.join(", ");
+        displaySearchResults(
+          data.results,
+          `Found ${data.results.length} files similar to uploaded file (detected: ${detectedSpecies})`
+        );
+      } else {
+        showError(data.error || "File analysis failed");
+      }
+    } catch (error) {
+      console.error("File-based search error:", error);
+      showError("Search request failed");
+    } finally {
+      hideSearchStatus();
+    }
+  }
+
+  // Display search results
+  function displaySearchResults(results, statusText) {
+    currentSearchResults = results;
+    currentPage = 1;
+
+    document.getElementById("resultsCount").textContent = statusText;
+    renderResults();
+    updatePagination();
+
+    if (results.length > 0) {
+      document.getElementById("pagination").classList.remove("hidden");
+    }
+  }
+
+  // Render results based on current view
+  function renderResults() {
+    const container = document.getElementById("resultsContainer");
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(
+      startIndex + itemsPerPage,
+      currentSearchResults.length
+    );
+    const pageResults = currentSearchResults.slice(startIndex, endIndex);
+
+    if (pageResults.length === 0) {
+      container.innerHTML = `
+            <div class="col-span-full text-center py-12 text-gray-500">
+                <i data-lucide="search-x" class="w-16 h-16 mx-auto mb-4 text-gray-300"></i>
+                <p class="text-lg font-medium">No results found</p>
+                <p class="text-sm">Try adjusting your search criteria</p>
+            </div>
+        `;
+      lucide.createIcons();
+      return;
+    }
+
+    if (currentView === "grid") {
+      container.className =
+        "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4";
+      container.innerHTML = pageResults
+        .map((result) => createGridItem(result))
+        .join("");
+    } else {
+      container.className = "space-y-4";
+      container.innerHTML = pageResults
+        .map((result) => createListItem(result))
+        .join("");
+    }
+
+    lucide.createIcons();
+  }
+
+  // Create grid item HTML
+  function createGridItem(result) {
+    const isSelected = selectedFiles.has(result.url);
+    const fileIcon = getFileIcon(result.type);
+
+    return `
+        <div class="group cursor-pointer relative" data-url="${result.url}">
+            <div class="relative">
+                <div class="aspect-square bg-gradient-to-br ${
+                  fileIcon.gradient
+                } rounded-xl mb-3 flex items-center justify-center group-hover:scale-105 transition-transform duration-200 shadow-sm">
+                    ${
+                      result.thumbnailUrl
+                        ? `<img src="${result.thumbnailUrl}" alt="${result.filename}" class="w-full h-full object-cover rounded-xl" onclick="showImagePreview('${result.url}', '${result.thumbnailUrl}', '${result.filename}')">`
+                        : `<i data-lucide="${fileIcon.icon}" class="w-10 h-10 text-white"></i>`
+                    }
+                </div>
+                <input type="checkbox" ${isSelected ? "checked" : ""} 
+                       onchange="toggleFileSelection('${result.url}')"
+                       class="absolute top-2 left-2 rounded">
+                <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                    ${result.confidence || "95"}%
+                </div>
+            </div>
+            <p class="text-sm font-medium text-gray-900 truncate">${
+              result.filename
+            }</p>
+            <p class="text-xs text-gray-500">${
+              result.species?.join(", ") || "Unknown species"
+            }</p>
+            <p class="text-xs text-gray-400">${result.size} • ${
+      result.uploadedAt
+    }</p>
+        </div>
+    `;
+  }
+
+  // Create list item HTML
+  function createListItem(result) {
+    const isSelected = selectedFiles.has(result.url);
+    const fileIcon = getFileIcon(result.type);
+
+    return `
+        <div class="glass-effect rounded-xl p-4 hover:shadow-lg transition-all duration-200" data-url="${
+          result.url
+        }">
+            <div class="flex items-center space-x-4">
+                <input type="checkbox" ${isSelected ? "checked" : ""} 
+                       onchange="toggleFileSelection('${result.url}')"
+                       class="rounded">
+                
+                <div class="w-16 h-16 bg-gradient-to-br ${
+                  fileIcon.gradient
+                } rounded-lg flex items-center justify-center flex-shrink-0">
+                    ${
+                      result.thumbnailUrl
+                        ? `<img src="${result.thumbnailUrl}" alt="${result.filename}" class="w-full h-full object-cover rounded-lg cursor-pointer" onclick="showImagePreview('${result.url}', '${result.thumbnailUrl}', '${result.filename}')">`
+                        : `<i data-lucide="${fileIcon.icon}" class="w-8 h-8 text-white"></i>`
+                    }
+                </div>
+                
+                <div class="flex-1 min-w-0">
+                    <p class="text-lg font-semibold text-gray-900 truncate">${
+                      result.filename
+                    }</p>
+                    <p class="text-sm text-gray-600">Species: ${
+                      result.species?.join(", ") || "Unknown"
+                    }</p>
+                    <p class="text-sm text-gray-500">Size: ${
+                      result.size
+                    } • Uploaded: ${result.uploadedAt}</p>
+                    <div class="flex items-center space-x-2 mt-2">
+                        ${
+                          result.tags
+                            ?.map(
+                              (tag) =>
+                                `<span class="bg-bird-100 text-bird-700 px-2 py-1 rounded-full text-xs">${tag}</span>`
+                            )
+                            .join("") || ""
+                        }
+                    </div>
+                </div>
+                
+                <div class="flex flex-col items-end space-y-2">
+                    <div class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                        ${result.confidence || "95"}%
+                    </div>
+                    <div class="flex space-x-1">
+                        ${
+                          result.type === "image"
+                            ? `<button onclick="downloadFullImage('${result.url}')" class="p-2 bg-bird-100 text-bird-600 rounded-lg hover:bg-bird-200 transition-colors duration-200" title="Download full size">
+                                <i data-lucide="download" class="w-4 h-4"></i>
+                            </button>`
+                            : `<button onclick="downloadFile('${result.url}')" class="p-2 bg-nature-100 text-nature-600 rounded-lg hover:bg-nature-200 transition-colors duration-200" title="Download file">
+                                <i data-lucide="download" class="w-4 h-4"></i>
+                            </button>`
+                        }
+                        <button onclick="shareFile('${
+                          result.url
+                        }')" class="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors duration-200" title="Share">
+                            <i data-lucide="share" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+  }
+
+  // Utility functions
+  function getFileIcon(type) {
+    switch (type) {
+      case "image":
+        return { icon: "image", gradient: "from-bird-100 to-bird-200" };
+      case "video":
+        return { icon: "video", gradient: "from-nature-100 to-nature-200" };
+      case "audio":
+        return { icon: "music", gradient: "from-purple-100 to-purple-200" };
+      default:
+        return { icon: "file", gradient: "from-gray-100 to-gray-200" };
+    }
+  }
+
+  // File selection management
+  function toggleFileSelection(url) {
+    if (selectedFiles.has(url)) {
+      selectedFiles.delete(url);
+    } else {
+      selectedFiles.add(url);
+    }
+    updateSelectedCount();
+  }
+
+  function updateSelectedCount() {
+    document.getElementById("selectedCount").textContent = selectedFiles.size;
+    document.getElementById("affectedFiles").textContent = selectedFiles.size;
+  }
+
+  // View switching
+  function setView(view) {
+    currentView = view;
+
+    // Update button states
+    document
+      .getElementById("gridView")
+      .classList.toggle("bg-bird-50", view === "grid");
+    document
+      .getElementById("gridView")
+      .classList.toggle("border-bird-300", view === "grid");
+    document
+      .getElementById("listView")
+      .classList.toggle("bg-bird-50", view === "list");
+    document
+      .getElementById("listView")
+      .classList.toggle("border-bird-300", view === "list");
+
+    renderResults();
+  }
+
+  // Pagination
+  function updatePagination() {
+    const totalPages = Math.ceil(currentSearchResults.length / itemsPerPage);
+    const startItem = (currentPage - 1) * itemsPerPage + 1;
+    const endItem = Math.min(
+      currentPage * itemsPerPage,
+      currentSearchResults.length
+    );
+
+    document.getElementById("showingStart").textContent = startItem;
+    document.getElementById("showingEnd").textContent = endItem;
+    document.getElementById("totalResults").textContent =
+      currentSearchResults.length;
+
+    document.getElementById("prevPage").disabled = currentPage === 1;
+    document.getElementById("nextPage").disabled = currentPage === totalPages;
+
+    // Generate page numbers
+    const pageNumbers = document.getElementById("pageNumbers");
+    pageNumbers.innerHTML = "";
+
+    for (
+      let i = Math.max(1, currentPage - 2);
+      i <= Math.min(totalPages, currentPage + 2);
+      i++
+    ) {
+      const pageBtn = document.createElement("button");
+      pageBtn.textContent = i;
+      pageBtn.className = `px-3 py-2 rounded-lg ${
+        i === currentPage
+          ? "bg-bird-500 text-white"
+          : "border border-gray-300 hover:bg-gray-50"
+      }`;
+      pageBtn.onclick = () => goToPage(i);
+      pageNumbers.appendChild(pageBtn);
+    }
+  }
+
+  function changePage(direction) {
+    const newPage = currentPage + direction;
+    const totalPages = Math.ceil(currentSearchResults.length / itemsPerPage);
+
+    if (newPage >= 1 && newPage <= totalPages) {
+      goToPage(newPage);
+    }
+  }
+
+  function goToPage(page) {
+    currentPage = page;
+    renderResults();
+    updatePagination();
+  }
+
+  // Tag input management
+  function addTagInput() {
+    const container = document.getElementById("tagInputs");
+    const newRow = document.createElement("div");
+    newRow.className = "tag-input-row flex space-x-2 mb-2";
+    newRow.innerHTML = `
+        <input type="text" placeholder="Species name" 
+               class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-bird-500 focus:border-transparent">
+        <input type="number" placeholder="Min count" min="1" value="1"
+               class="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-bird-500 focus:border-transparent">
+        <button onclick="removeTagInput(this)" class="text-red-500 hover:text-red-700 p-2">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+    `;
+    container.appendChild(newRow);
+    lucide.createIcons();
+  }
+
+  function removeTagInput(button) {
+    const rows = document.querySelectorAll(".tag-input-row");
+    if (rows.length > 1) {
+      button.closest(".tag-input-row").remove();
+    }
+  }
+
+  // Bulk tag management
+  function addBulkTagInput() {
+    const container = document.getElementById("bulkTagInputs");
+    const newRow = document.createElement("div");
+    newRow.className = "bulk-tag-row flex space-x-2 mb-2";
+    newRow.innerHTML = `
+        <input type="text" placeholder="Species name" 
+               class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-bird-500 focus:border-transparent">
+        <input type="number" placeholder="Count" min="1" value="1"
+               class="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-bird-500 focus:border-transparent">
+        <button type="button" onclick="removeBulkTagInput(this)" class="text-red-500 hover:text-red-700 p-2">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+    `;
+    container.appendChild(newRow);
+    lucide.createIcons();
+  }
+
+  function removeBulkTagInput(button) {
+    const rows = document.querySelectorAll(".bulk-tag-row");
+    if (rows.length > 1) {
+      button.closest(".bulk-tag-row").remove();
+    }
+  }
+
+  function showBulkTagModal() {
+    if (selectedFiles.size === 0) {
+      alert("Please select files to manage tags");
+      return;
+    }
+    document.getElementById("bulkTagModal").classList.remove("hidden");
+  }
+
+  function hideBulkTagModal() {
+    document.getElementById("bulkTagModal").classList.add("hidden");
+  }
+
+  async function handleBulkTagSubmit(e) {
+    e.preventDefault();
+
+    const operation = parseInt(document.getElementById("tagOperation").value);
+    const tagRows = document.querySelectorAll(".bulk-tag-row");
+    const tags = [];
+
+    for (let row of tagRows) {
+      const species = row.querySelector('input[type="text"]').value.trim();
+      const count =
+        parseInt(row.querySelector('input[type="number"]').value) || 1;
+
+      if (species) {
+        tags.push(`${species},${count}`);
+      }
+    }
+
+    if (tags.length === 0) {
+      alert("Please add at least one tag");
+      return;
+    }
+
+    try {
+      const response = await fetch(ENDPOINTS.bulkTag, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          url: Array.from(selectedFiles),
+          operation: operation,
+          tags: tags,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert(
+          `Successfully ${operation === 1 ? "added" : "removed"} tags for ${
+            selectedFiles.size
+          } files`
+        );
+        hideBulkTagModal();
+        // Refresh current search results if any
+        if (currentSearchResults.length > 0) {
+          // Re-run the last search to get updated data
+          refreshCurrentSearch();
+        }
+      } else {
+        alert("Failed to update tags: " + (data.error || "Unknown error"));
+      }
+    } catch (error) {
+      console.error("Bulk tag error:", error);
+      alert("Failed to update tags");
+    }
+  }
+
+  // File operations
+  async function deleteSelected() {
+    if (selectedFiles.size === 0) {
+      alert("Please select files to delete");
+      return;
+    }
+
+    if (
+      !confirm(
+        `Are you sure you want to delete ${selectedFiles.size} files? This action cannot be undone.`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const response = await fetch(ENDPOINTS.delete, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          urls: Array.from(selectedFiles),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert(`Successfully deleted ${selectedFiles.size} files`);
+        selectedFiles.clear();
+        updateSelectedCount();
+        // Remove deleted files from current results
+        currentSearchResults = currentSearchResults.filter(
+          (result) => !Array.from(selectedFiles).includes(result.url)
+        );
+        renderResults();
+        updatePagination();
+      } else {
+        alert("Failed to delete files: " + (data.error || "Unknown error"));
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert("Failed to delete files");
+    }
+  }
+
+  function downloadSelected() {
+    if (selectedFiles.size === 0) {
+      alert("Please select files to download");
+      return;
+    }
+
+    // Create download links for selected files
+    Array.from(selectedFiles).forEach((url) => {
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "";
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+  }
+
+  // File handling
+  function handleFileSelection(e) {
+    const file = e.target.files[0];
+    if (file) {
+      document.getElementById("fileName").textContent = file.name;
+      document.getElementById("selectedFile").classList.remove("hidden");
+    }
+  }
+
+  function clearSelectedFile() {
+    document.getElementById("searchFile").value = "";
+    document.getElementById("selectedFile").classList.add("hidden");
+  }
+
+  // Image preview
+  function showImagePreview(url, thumbnailUrl, filename) {
+    document.getElementById("modalImage").src = thumbnailUrl || url;
+    document.getElementById("modalImageInfo").textContent = filename;
+    document.getElementById("imageModal").classList.remove("hidden");
+  }
+
+  function hideImageModal() {
+    document.getElementById("imageModal").classList.add("hidden");
+  }
+
+  function showFullSizeImage(fullSizeUrl, thumbnailUrl) {
+    const modal = document.getElementById("imageModal");
+    const img = document.getElementById("modalImage");
+
+    img.src = fullSizeUrl;
+    document.getElementById("modalImageInfo").textContent = "Full-size image";
+    modal.classList.remove("hidden");
+  }
+
+  function downloadFullImage() {
+    const img = document.getElementById("modalImage");
+    const link = document.createElement("a");
+    link.href = img.src;
+    link.download = "";
+    link.target = "_blank";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  function downloadFile(url) {
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "";
+    link.target = "_blank";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  function shareFile(url) {
+    if (navigator.share) {
+      navigator.share({
+        title: "BirdTag Media File",
+        url: url,
+      });
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(url).then(() => {
+        alert("File URL copied to clipboard");
+      });
+    }
+  }
+
+  // UI helpers
+  function showSearchStatus() {
+    document.getElementById("searchStatus").classList.remove("hidden");
+  }
+
+  function hideSearchStatus() {
+    document.getElementById("searchStatus").classList.add("hidden");
+  }
+
+  function showError(message) {
+    alert("Error: " + message);
+  }
+
+  function handleSortChange() {
+    const sortBy = document.getElementById("sortBy").value;
+
+    currentSearchResults.sort((a, b) => {
+      switch (sortBy) {
+        case "date":
+          return new Date(b.uploadedAt) - new Date(a.uploadedAt);
+        case "species":
+          return (a.species?.[0] || "").localeCompare(b.species?.[0] || "");
+        case "size":
+          return parseFloat(b.size) - parseFloat(a.size);
+        case "confidence":
+          return (b.confidence || 0) - (a.confidence || 0);
+        default:
+          return 0;
+      }
+    });
+
+    renderResults();
+  }
+
+  function refreshCurrentSearch() {
+    // This would re-run the current search based on the active search type
+    // Implementation depends on tracking the current search parameters
+    console.log("Refreshing current search...");
+  }
+
+  // Example API response handling for development/testing
+  function mockApiResponse(type) {
+    const mockResults = [
+      {
+        url: "https://birdtag-bucket.s3.amazonaws.com/cardinal_001.jpg",
+        thumbnailUrl:
+          "https://birdtag-bucket.s3.amazonaws.com/thumbnails/cardinal_001_thumb.jpg",
+        filename: "cardinal_001.jpg",
+        type: "image",
+        species: ["Northern Cardinal"],
+        tags: ["cardinal,2", "red,1"],
+        confidence: 96,
+        size: "2.3 MB",
+        uploadedAt: "2 hours ago",
+      },
+      {
+        url: "https://birdtag-bucket.s3.amazonaws.com/eagle_flight.mp4",
+        thumbnailUrl: null,
+        filename: "eagle_flight.mp4",
+        type: "video",
+        species: ["Bald Eagle"],
+        tags: ["eagle,1", "flying,1"],
+        confidence: 94,
+        size: "15.7 MB",
+        uploadedAt: "1 day ago",
+      },
+      {
+        url: "https://birdtag-bucket.s3.amazonaws.com/robin_song.wav",
+        thumbnailUrl: null,
+        filename: "robin_song.wav",
+        type: "audio",
+        species: ["American Robin"],
+        tags: ["robin,1", "singing,1"],
+        confidence: 89,
+        size: "1.2 MB",
+        uploadedAt: "3 days ago",
+      },
+    ];
+
+    return {
+      success: true,
+      results: mockResults,
+      detectedTags: ["cardinal", "red"], // For file-based search
+    };
+  }
+</script>
+{% endblock %}

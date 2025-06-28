@@ -120,7 +120,7 @@ endblock %} {% block content %}
     <!-- Back to Login -->
     <div class="mt-6 text-center">
       <a
-        href="{{ url_for('auth.login') }}"
+        href="{{ url_for('login') }}"
         class="text-gray-500 hover:text-gray-700 text-sm flex items-center justify-center space-x-2"
       >
         <i data-lucide="arrow-left" class="w-4 h-4"></i>
@@ -140,7 +140,7 @@ endblock %} {% block content %}
     document.getElementById("emailDisplay").textContent = email;
   } else {
     // Redirect to signup if no email
-    window.location.href = '{{ url_for("auth.signup") }}';
+    window.location.href = '{{ url_for("signup") }}';
   }
 
   // Auto-format confirmation code input
@@ -171,7 +171,7 @@ endblock %} {% block content %}
       const formData = new FormData(this);
 
       // Submit form
-      fetch('{{ url_for("auth.confirm") }}', {
+      fetch('{{ url_for("confirm") }}', {
         method: "POST",
         body: formData,
       })
@@ -180,7 +180,7 @@ endblock %} {% block content %}
           if (data.success) {
             // Show success message and redirect
             alert("Account confirmed successfully! You can now sign in.");
-            window.location.href = '{{ url_for("auth.login") }}';
+            window.location.href = '{{ url_for("login") }}';
           } else {
             // Show error
             alert(data.error || "Confirmation failed. Please check your code.");
@@ -233,7 +233,7 @@ endblock %} {% block content %}
     }, 1000);
 
     // Send resend request
-    fetch('{{ url_for("auth.resend_code") }}', {
+    fetch('{{ url_for("resend_code") }}', {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",

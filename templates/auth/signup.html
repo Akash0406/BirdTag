@@ -171,7 +171,7 @@ endblock %} {% block content %}
         <p class="text-sm text-gray-600">
           Already have an account?
           <a
-            href="{{ url_for('auth.login') }}"
+            href="{{ url_for('login') }}"
             class="text-bird-600 hover:text-bird-700 font-medium"
           >
             Sign in here
@@ -215,7 +215,7 @@ endblock %} {% block content %}
       const formData = new FormData(this);
 
       // Submit form
-      fetch('{{ url_for("auth.signup") }}', {
+      fetch('{{ url_for("signup") }}', {
         method: "POST",
         body: formData,
       })
@@ -223,7 +223,7 @@ endblock %} {% block content %}
         .then((data) => {
           if (data.success) {
             // Redirect to confirmation page
-            window.location.href = `{{ url_for("auth.confirm") }}?email=${encodeURIComponent(
+            window.location.href = `{{ url_for("confirm") }}?email=${encodeURIComponent(
               formData.get("email")
             )}`;
           } else {

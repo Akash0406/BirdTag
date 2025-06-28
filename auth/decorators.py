@@ -8,7 +8,7 @@ def login_required(f):
         if 'user' not in session:
             if request.is_json:
                 return jsonify({'error': 'Authentication required'}), 401
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -17,6 +17,6 @@ def anonymous_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user' in session:
-            return redirect(url_for('main.dashboard'))
+            return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
     return decorated_function
