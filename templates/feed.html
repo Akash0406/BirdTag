@@ -1,0 +1,579 @@
+{% extends "base.html" %} {% block title %}Feed - BirdTag Community{% endblock
+%} {% block content %}
+<div class="max-w-7xl mx-auto px-6 py-8">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Community Feed</h1>
+        <p class="text-gray-600">
+          Connect with bird researchers and share your discoveries
+        </p>
+      </div>
+      <button
+        onclick="showCreatePostModal()"
+        class="bird-gradient text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-all duration-200 flex items-center space-x-2"
+      >
+        <i data-lucide="plus" class="w-5 h-5"></i>
+        <span>Create Post</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+    <!-- Feed Content -->
+    <div class="lg:col-span-3 space-y-6">
+      <!-- Filter Tabs -->
+      <div class="glass-effect rounded-xl p-4">
+        <div class="flex space-x-6">
+          <button
+            class="feed-tab active px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+            data-tab="all"
+          >
+            All Posts
+          </button>
+          <button
+            class="feed-tab px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+            data-tab="following"
+          >
+            Following
+          </button>
+          <button
+            class="feed-tab px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+            data-tab="discoveries"
+          >
+            New Discoveries
+          </button>
+          <button
+            class="feed-tab px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+            data-tab="research"
+          >
+            Research Updates
+          </button>
+        </div>
+      </div>
+
+      <!-- Posts -->
+      <div class="space-y-6" id="feedPosts">
+        <!-- Post 1 -->
+        <div class="glass-effect rounded-xl p-6">
+          <div class="flex items-start space-x-4">
+            <div
+              class="w-12 h-12 bg-gradient-to-r from-bird-400 to-bird-600 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <span class="text-white font-bold">SC</span>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center space-x-2 mb-2">
+                <h3 class="font-semibold text-gray-900">Dr. Sarah Chen</h3>
+                <span class="text-sm text-gray-500">•</span>
+                <span class="text-sm text-gray-500">2 hours ago</span>
+                <span
+                  class="bg-bird-100 text-bird-700 px-2 py-1 rounded-full text-xs font-medium"
+                  >Ornithologist</span
+                >
+              </div>
+              <p class="text-gray-700 mb-4">
+                Exciting discovery today! Our AI detected a rare Peregrine
+                Falcon during migration season. The behavioral patterns captured
+                in this footage could provide valuable insights into their
+                hunting strategies. 🦅
+              </p>
+
+              <!-- Post Image -->
+              <div class="mb-4">
+                <div
+                  class="aspect-video bg-gradient-to-br from-bird-100 to-bird-200 rounded-lg flex items-center justify-center"
+                >
+                  <div class="text-center">
+                    <i
+                      data-lucide="play-circle"
+                      class="w-16 h-16 text-bird-600 mb-2"
+                    ></i>
+                    <p class="text-bird-700 font-medium">
+                      Peregrine_Falcon_Hunt.mp4
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Post Actions -->
+              <div class="flex items-center space-x-6 text-sm text-gray-500">
+                <button
+                  class="flex items-center space-x-2 hover:text-bird-600 transition-colors duration-200"
+                >
+                  <i data-lucide="heart" class="w-4 h-4"></i>
+                  <span>24 likes</span>
+                </button>
+                <button
+                  class="flex items-center space-x-2 hover:text-bird-600 transition-colors duration-200"
+                >
+                  <i data-lucide="message-circle" class="w-4 h-4"></i>
+                  <span>8 comments</span>
+                </button>
+                <button
+                  class="flex items-center space-x-2 hover:text-bird-600 transition-colors duration-200"
+                >
+                  <i data-lucide="share" class="w-4 h-4"></i>
+                  <span>Share</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Post 2 -->
+        <div class="glass-effect rounded-xl p-6">
+          <div class="flex items-start space-x-4">
+            <div
+              class="w-12 h-12 bg-gradient-to-r from-nature-400 to-nature-600 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <span class="text-white font-bold">MJ</span>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center space-x-2 mb-2">
+                <h3 class="font-semibold text-gray-900">Marcus Johnson</h3>
+                <span class="text-sm text-gray-500">•</span>
+                <span class="text-sm text-gray-500">5 hours ago</span>
+                <span
+                  class="bg-nature-100 text-nature-700 px-2 py-1 rounded-full text-xs font-medium"
+                  >PhD Student</span
+                >
+              </div>
+              <p class="text-gray-700 mb-4">
+                Amazing morning at the wetlands! Captured some incredible shots
+                of migrating waterfowl. The AI identified 12 different species
+                in just one session. Here are some highlights from today's
+                expedition.
+              </p>
+
+              <!-- Post Images Grid -->
+              <div class="grid grid-cols-2 gap-3 mb-4">
+                <div
+                  class="aspect-square bg-gradient-to-br from-nature-100 to-nature-200 rounded-lg flex items-center justify-center"
+                >
+                  <i data-lucide="image" class="w-8 h-8 text-nature-600"></i>
+                </div>
+                <div
+                  class="aspect-square bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center"
+                >
+                  <i data-lucide="image" class="w-8 h-8 text-blue-600"></i>
+                </div>
+                <div
+                  class="aspect-square bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg flex items-center justify-center"
+                >
+                  <i data-lucide="image" class="w-8 h-8 text-purple-600"></i>
+                </div>
+                <div
+                  class="aspect-square bg-gradient-to-br from-orange-100 to-orange-200 rounded-lg flex items-center justify-center relative"
+                >
+                  <i data-lucide="image" class="w-8 h-8 text-orange-600"></i>
+                  <div
+                    class="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center"
+                  >
+                    <span class="text-white font-bold">+8 more</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Species Tags -->
+              <div class="flex flex-wrap gap-2 mb-4">
+                <span
+                  class="bg-bird-100 text-bird-700 px-2 py-1 rounded-full text-xs"
+                  >Mallard Duck</span
+                >
+                <span
+                  class="bg-nature-100 text-nature-700 px-2 py-1 rounded-full text-xs"
+                  >Great Blue Heron</span
+                >
+                <span
+                  class="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs"
+                  >Canada Goose</span
+                >
+                <span
+                  class="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-xs"
+                  >+9 species</span
+                >
+              </div>
+
+              <!-- Post Actions -->
+              <div class="flex items-center space-x-6 text-sm text-gray-500">
+                <button
+                  class="flex items-center space-x-2 hover:text-bird-600 transition-colors duration-200"
+                >
+                  <i data-lucide="heart" class="w-4 h-4"></i>
+                  <span>42 likes</span>
+                </button>
+                <button
+                  class="flex items-center space-x-2 hover:text-bird-600 transition-colors duration-200"
+                >
+                  <i data-lucide="message-circle" class="w-4 h-4"></i>
+                  <span>15 comments</span>
+                </button>
+                <button
+                  class="flex items-center space-x-2 hover:text-bird-600 transition-colors duration-200"
+                >
+                  <i data-lucide="share" class="w-4 h-4"></i>
+                  <span>Share</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Post 3 -->
+        <div class="glass-effect rounded-xl p-6">
+          <div class="flex items-start space-x-4">
+            <div
+              class="w-12 h-12 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <span class="text-white font-bold">AL</span>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center space-x-2 mb-2">
+                <h3 class="font-semibold text-gray-900">Dr. Anna Liu</h3>
+                <span class="text-sm text-gray-500">•</span>
+                <span class="text-sm text-gray-500">1 day ago</span>
+                <span
+                  class="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs font-medium"
+                  >Research Lead</span
+                >
+              </div>
+              <p class="text-gray-700 mb-4">
+                📊 New research findings! Our team analyzed over 10,000 bird
+                calls using BirdTag's AI system. We've identified previously
+                unknown vocal patterns in urban vs. rural bird populations.
+                Paper submission coming soon! #Bioacoustics #UrbanEcology
+              </p>
+
+              <!-- Research Preview -->
+              <div
+                class="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-4 mb-4"
+              >
+                <div class="flex items-center space-x-3">
+                  <div
+                    class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center"
+                  >
+                    <i
+                      data-lucide="file-text"
+                      class="w-5 h-5 text-purple-600"
+                    ></i>
+                  </div>
+                  <div>
+                    <h4 class="font-medium text-gray-900">
+                      Urban Bird Vocalizations Study
+                    </h4>
+                    <p class="text-sm text-gray-600">
+                      Analysis of 10,247 recorded bird calls across metropolitan
+                      areas
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Post Actions -->
+              <div class="flex items-center space-x-6 text-sm text-gray-500">
+                <button
+                  class="flex items-center space-x-2 hover:text-bird-600 transition-colors duration-200"
+                >
+                  <i data-lucide="heart" class="w-4 h-4"></i>
+                  <span>67 likes</span>
+                </button>
+                <button
+                  class="flex items-center space-x-2 hover:text-bird-600 transition-colors duration-200"
+                >
+                  <i data-lucide="message-circle" class="w-4 h-4"></i>
+                  <span>23 comments</span>
+                </button>
+                <button
+                  class="flex items-center space-x-2 hover:text-bird-600 transition-colors duration-200"
+                >
+                  <i data-lucide="share" class="w-4 h-4"></i>
+                  <span>Share</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Load More -->
+      <div class="text-center">
+        <button
+          class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors duration-200"
+        >
+          Load More Posts
+        </button>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="lg:col-span-1 space-y-6">
+      <!-- Active Researchers -->
+      <div class="glass-effect rounded-xl p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <i data-lucide="users" class="w-5 h-5 mr-2 text-bird-600"></i>
+          Active Researchers
+        </h3>
+
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div
+                class="w-8 h-8 bg-gradient-to-r from-bird-400 to-bird-600 rounded-full flex items-center justify-center"
+              >
+                <span class="text-white text-sm font-bold">SC</span>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-900">Dr. Sarah Chen</p>
+                <p class="text-xs text-gray-500">Raptors Expert</p>
+              </div>
+            </div>
+            <button class="text-bird-600 hover:text-bird-700 p-1">
+              <i data-lucide="message-circle" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div
+                class="w-8 h-8 bg-gradient-to-r from-nature-400 to-nature-600 rounded-full flex items-center justify-center"
+              >
+                <span class="text-white text-sm font-bold">MJ</span>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-900">Marcus Johnson</p>
+                <p class="text-xs text-gray-500">PhD Student</p>
+              </div>
+            </div>
+            <button class="text-bird-600 hover:text-bird-700 p-1">
+              <i data-lucide="message-circle" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div
+                class="w-8 h-8 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full flex items-center justify-center"
+              >
+                <span class="text-white text-sm font-bold">AL</span>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-900">Dr. Anna Liu</p>
+                <p class="text-xs text-gray-500">Research Lead</p>
+              </div>
+            </div>
+            <button class="text-bird-600 hover:text-bird-700 p-1">
+              <i data-lucide="message-circle" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div
+                class="w-8 h-8 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full flex items-center justify-center"
+              >
+                <span class="text-white text-sm font-bold">RT</span>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-900">Robert Taylor</p>
+                <p class="text-xs text-gray-500">Field Researcher</p>
+              </div>
+            </div>
+            <button class="text-bird-600 hover:text-bird-700 p-1">
+              <i data-lucide="message-circle" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <button
+          class="w-full mt-4 text-bird-600 hover:text-bird-700 text-sm font-medium"
+        >
+          View All Researchers
+        </button>
+      </div>
+
+      <!-- Trending Species -->
+      <div class="glass-effect rounded-xl p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <i data-lucide="trending-up" class="w-5 h-5 mr-2 text-nature-600"></i>
+          Trending Species
+        </h3>
+
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-700">Northern Cardinal</span>
+            <span
+              class="text-xs bg-bird-100 text-bird-700 px-2 py-1 rounded-full"
+              >+47 posts</span
+            >
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-700">Peregrine Falcon</span>
+            <span
+              class="text-xs bg-nature-100 text-nature-700 px-2 py-1 rounded-full"
+              >+32 posts</span
+            >
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-700">Great Blue Heron</span>
+            <span
+              class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full"
+              >+28 posts</span
+            >
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-700">American Robin</span>
+            <span
+              class="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full"
+              >+19 posts</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="glass-effect rounded-xl p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <i data-lucide="activity" class="w-5 h-5 mr-2 text-purple-600"></i>
+          Recent Activity
+        </h3>
+
+        <div class="space-y-3 text-sm">
+          <p class="text-gray-600">
+            <span class="font-medium">Sarah</span> identified a rare species
+            <span class="text-xs text-gray-500">2h ago</span>
+          </p>
+          <p class="text-gray-600">
+            <span class="font-medium">Marcus</span> uploaded 12 new photos
+            <span class="text-xs text-gray-500">4h ago</span>
+          </p>
+          <p class="text-gray-600">
+            <span class="font-medium">Anna</span> published new research
+            <span class="text-xs text-gray-500">1d ago</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Post Modal -->
+<div
+  id="createPostModal"
+  class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+>
+  <div class="bg-white rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-semibold text-gray-900">Create New Post</h3>
+        <button
+          onclick="hideCreatePostModal()"
+          class="text-gray-500 hover:text-gray-700"
+        >
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="createPostForm" class="space-y-4">
+        <div>
+          <textarea
+            placeholder="Share your bird research discoveries, observations, or insights..."
+            class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-bird-500 focus:border-transparent resize-none"
+            rows="4"
+          ></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Attach Media (Optional)</label
+          >
+          <div
+            class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center"
+          >
+            <i
+              data-lucide="upload"
+              class="w-8 h-8 text-gray-400 mx-auto mb-2"
+            ></i>
+            <p class="text-sm text-gray-600">
+              Drag and drop files here, or click to browse
+            </p>
+            <input
+              type="file"
+              class="hidden"
+              multiple
+              accept="image/*,video/*,audio/*"
+            />
+          </div>
+        </div>
+
+        <div class="flex space-x-3 pt-4">
+          <button
+            type="button"
+            onclick="hideCreatePostModal()"
+            class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg transition-colors duration-200"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="flex-1 bird-gradient text-white py-2 px-4 rounded-lg hover:opacity-90 transition-all duration-200"
+          >
+            Post
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Tab functionality
+  document.querySelectorAll(".feed-tab").forEach((tab) => {
+    tab.addEventListener("click", function () {
+      // Remove active class from all tabs
+      document.querySelectorAll(".feed-tab").forEach((t) => {
+        t.classList.remove("active", "bird-gradient", "text-white");
+        t.classList.add("text-gray-600", "hover:text-gray-900");
+      });
+
+      // Add active class to clicked tab
+      this.classList.add("active", "bird-gradient", "text-white");
+      this.classList.remove("text-gray-600", "hover:text-gray-900");
+
+      // Filter posts based on tab (this would connect to your API)
+      const tabType = this.dataset.tab;
+      console.log("Filtering posts by:", tabType);
+    });
+  });
+
+  // Set initial active tab styling
+  document
+    .querySelector(".feed-tab.active")
+    .classList.add("bird-gradient", "text-white");
+
+  // Modal functions
+  function showCreatePostModal() {
+    document.getElementById("createPostModal").classList.remove("hidden");
+  }
+
+  function hideCreatePostModal() {
+    document.getElementById("createPostModal").classList.add("hidden");
+  }
+
+  // Form submission
+  document
+    .getElementById("createPostForm")
+    .addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      // This would typically send data to your backend API
+      alert("Post created successfully!");
+      hideCreatePostModal();
+
+      // Reset form
+      this.reset();
+    });
+</script>
+{% endblock %}

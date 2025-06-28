@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      {% block title %}BirdTag - AI-Powered Bird Media Organizer{% endblock %}
+    </title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- Custom Tailwind Config -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              bird: {
+                50: "#f0f9ff",
+                100: "#e0f2fe",
+                200: "#bae6fd",
+                300: "#7dd3fc",
+                400: "#38bdf8",
+                500: "#0ea5e9",
+                600: "#0284c7",
+                700: "#0369a1",
+                800: "#075985",
+                900: "#0c4a6e",
+              },
+              nature: {
+                50: "#f7fee7",
+                100: "#ecfccb",
+                200: "#d9f99d",
+                300: "#bef264",
+                400: "#a3e635",
+                500: "#84cc16",
+                600: "#65a30d",
+                700: "#4d7c0f",
+                800: "#365314",
+                900: "#1a2e05",
+              },
+            },
+            fontFamily: {
+              display: ["Inter", "system-ui", "sans-serif"],
+            },
+            animation: {
+              float: "float 3s ease-in-out infinite",
+              "fade-in": "fadeIn 0.5s ease-in",
+              "slide-up": "slideUp 0.3s ease-out",
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes slideUp {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .bird-gradient {
+        background: linear-gradient(
+          135deg,
+          #0ea5e9 0%,
+          #3b82f6 50%,
+          #8b5cf6 100%
+        );
+      }
+
+      .nature-gradient {
+        background: linear-gradient(
+          135deg,
+          #84cc16 0%,
+          #22c55e 50%,
+          #10b981 100%
+        );
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-br from-bird-50 via-white to-nature-50 min-h-screen font-display"
+  >
+    <!-- Navigation Bar -->
+    {% if session.user %}
+    <nav class="glass-effect fixed top-0 left-0 right-0 z-50 px-6 py-4">
+      <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <!-- Logo & Brand -->
+        <div class="flex items-center space-x-4">
+          <div class="bird-gradient p-2 rounded-xl">
+            <i data-lucide="bird" class="w-6 h-6 text-white"></i>
+          </div>
+          <h1
+            class="text-2xl font-bold bg-gradient-to-r from-bird-600 to-bird-800 bg-clip-text text-transparent"
+          >
+            BirdTag
+          </h1>
+        </div>
+
+        <!-- Navigation Links -->
+        <div class="hidden md:flex items-center space-x-8">
+          <a
+            href="{{ url_for('main.dashboard') }}"
+            class="text-gray-700 hover:text-bird-600 font-medium transition-colors duration-200 flex items-center space-x-2"
+          >
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span>Dashboard</span>
+          </a>
+          <a
+            href="{{ url_for('main.feed') }}"
+            class="text-gray-700 hover:text-bird-600 font-medium transition-colors duration-200 flex items-center space-x-2"
+          >
+            <i data-lucide="rss" class="w-4 h-4"></i>
+            <span>Feed</span>
+          </a>
+        </div>
+
+        <!-- User Menu -->
+        <div class="flex items-center space-x-4">
+          <div class="hidden md:flex items-center space-x-3">
+            <div
+              class="w-8 h-8 bg-gradient-to-r from-bird-400 to-bird-600 rounded-full flex items-center justify-center"
+            >
+              <span class="text-white text-sm font-medium">
+                {{ session.user.given_name[0] if session.user.given_name else
+                session.user.email[0] }}
+              </span>
+            </div>
+            <span class="text-gray-700 font-medium"
+              >{{ session.user.given_name or 'User' }}</span
+            >
+          </div>
+          <a
+            href="{{ url_for('auth.logout') }}"
+            class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center space-x-2"
+          >
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            <span>Logout</span>
+          </a>
+        </div>
+      </div>
+    </nav>
+    <div class="pt-20"></div>
+    <!-- Spacer for fixed nav -->
+    {% endif %}
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div class="fixed top-24 right-6 z-50 space-y-2">
+      {% for category, message in messages %}
+      <div
+        class="animate-slide-up p-4 rounded-lg shadow-lg max-w-sm {% if category == 'error' %}bg-red-500 text-white {% elif category == 'success' %}bg-green-500 text-white {% elif category == 'warning' %}bg-yellow-500 text-white {% else %}bg-blue-500 text-white{% endif %}"
+      >
+        <div class="flex items-center justify-between">
+          <span>{{ message }}</span>
+          <button
+            onclick="this.parentElement.parentElement.remove()"
+            class="ml-4 text-white hover:text-gray-200"
+          >
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %} {% endwith %}
+
+    <!-- Main Content -->
+    <main class="animate-fade-in">{% block content %}{% endblock %}</main>
+
+    <!-- Footer -->
+    <footer class="mt-20 bg-gray-900 text-white py-12">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div class="col-span-2">
+            <div class="flex items-center space-x-3 mb-4">
+              <div class="bird-gradient p-2 rounded-xl">
+                <i data-lucide="bird" class="w-6 h-6 text-white"></i>
+              </div>
+              <h3 class="text-xl font-bold">BirdTag</h3>
+            </div>
+            <p class="text-gray-400 leading-relaxed">
+              Organize, tag, and discover your bird media collection with our
+              AI-powered platform. Built for researchers, students, and bird
+              enthusiasts worldwide.
+            </p>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-4">Features</h4>
+            <ul class="space-y-2 text-gray-400">
+              <li>AI Species Detection</li>
+              <li>Cloud Storage</li>
+              <li>Advanced Search</li>
+              <li>Collaboration Tools</li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-4">Support</h4>
+            <ul class="space-y-2 text-gray-400">
+              <li>Documentation</li>
+              <li>Contact Us</li>
+              <li>Privacy Policy</li>
+              <li>Terms of Service</li>
+            </ul>
+          </div>
+        </div>
+        <div
+          class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400"
+        >
+          <p>
+            &copy; 2025 BirdTag. Built with ❤️ for bird researchers worldwide.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Initialize Lucide Icons -->
+    <script>
+      lucide.createIcons();
+
+      // Auto-hide flash messages after 5 seconds
+      setTimeout(() => {
+        const messages = document.querySelectorAll(".fixed .animate-slide-up");
+        messages.forEach((msg) => {
+          msg.style.transition = "opacity 0.5s ease-out";
+          msg.style.opacity = "0";
+          setTimeout(() => msg.remove(), 500);
+        });
+      }, 5000);
+    </script>
+
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

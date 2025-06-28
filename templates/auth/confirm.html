@@ -1,0 +1,257 @@
+{% extends "base.html" %} {% block title %}Confirm Your Account - BirdTag{%
+endblock %} {% block content %}
+<div class="min-h-screen flex items-center justify-center px-6 py-12">
+  <div class="max-w-md w-full">
+    <!-- Email Icon Animation -->
+    <div class="text-center mb-8">
+      <div class="inline-block animate-float">
+        <div
+          class="bg-gradient-to-r from-green-400 to-green-600 p-4 rounded-full shadow-lg"
+        >
+          <i data-lucide="mail-check" class="w-12 h-12 text-white"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirmation Card -->
+    <div class="glass-effect rounded-2xl p-8 shadow-xl">
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">Check Your Email</h2>
+        <p class="text-gray-600">We've sent a confirmation code to</p>
+        <p class="font-semibold text-bird-600" id="emailDisplay"></p>
+      </div>
+
+      <!-- Confirmation Form -->
+      <form method="POST" id="confirmForm" class="space-y-6">
+        <input type="hidden" id="email" name="email" value="" />
+
+        <!-- Confirmation Code Field -->
+        <div>
+          <label
+            for="confirmationCode"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            <i data-lucide="key" class="w-4 h-4 inline mr-2"></i>
+            Confirmation Code
+          </label>
+          <input
+            type="text"
+            id="confirmationCode"
+            name="confirmationCode"
+            required
+            maxlength="6"
+            pattern="[0-9]{6}"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-bird-500 focus:border-transparent transition-all duration-200 bg-white/50 text-center text-xl font-mono tracking-widest"
+            placeholder="123456"
+            autocomplete="one-time-code"
+          />
+          <p class="text-xs text-gray-500 mt-1">
+            Enter the 6-digit code from your email
+          </p>
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          id="submitBtn"
+          class="w-full nature-gradient text-white py-3 px-4 rounded-lg font-medium hover:opacity-90 transition-all duration-200 transform hover:scale-[1.02] shadow-lg"
+        >
+          <span id="submitText">Confirm Account</span>
+          <div
+            id="submitSpinner"
+            class="hidden animate-spin inline-block w-4 h-4 ml-2"
+          >
+            <i data-lucide="loader" class="w-4 h-4"></i>
+          </div>
+        </button>
+      </form>
+
+      <!-- Resend Code -->
+      <div class="mt-6 text-center">
+        <p class="text-sm text-gray-600 mb-3">Didn't receive the code?</p>
+        <button
+          id="resendBtn"
+          onclick="resendCode()"
+          class="text-bird-600 hover:text-bird-700 font-medium text-sm border border-bird-200 hover:border-bird-300 px-4 py-2 rounded-lg transition-colors duration-200"
+        >
+          <i data-lucide="refresh-cw" class="w-4 h-4 inline mr-2"></i>
+          Resend Code
+        </button>
+        <div id="resendTimer" class="hidden text-xs text-gray-500 mt-2">
+          Please wait <span id="countdown">60</span> seconds before requesting a
+          new code
+        </div>
+      </div>
+
+      <!-- Instructions -->
+      <div class="mt-8 pt-6 border-t border-gray-200">
+        <div class="space-y-3">
+          <div class="flex items-start space-x-3 text-sm text-gray-600">
+            <div
+              class="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center mt-0.5"
+            >
+              <i data-lucide="mail" class="w-3 h-3 text-blue-600"></i>
+            </div>
+            <span
+              >Check your inbox and spam folder for the confirmation email</span
+            >
+          </div>
+          <div class="flex items-start space-x-3 text-sm text-gray-600">
+            <div
+              class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center mt-0.5"
+            >
+              <i data-lucide="shield-check" class="w-3 h-3 text-green-600"></i>
+            </div>
+            <span>The code is valid for 15 minutes for security</span>
+          </div>
+          <div class="flex items-start space-x-3 text-sm text-gray-600">
+            <div
+              class="w-5 h-5 bg-purple-100 rounded-full flex items-center justify-center mt-0.5"
+            >
+              <i data-lucide="clock" class="w-3 h-3 text-purple-600"></i>
+            </div>
+            <span>You can request a new code if needed</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Back to Login -->
+    <div class="mt-6 text-center">
+      <a
+        href="{{ url_for('auth.login') }}"
+        class="text-gray-500 hover:text-gray-700 text-sm flex items-center justify-center space-x-2"
+      >
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        <span>Back to Login</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Get email from URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const email = urlParams.get("email");
+
+  if (email) {
+    document.getElementById("email").value = email;
+    document.getElementById("emailDisplay").textContent = email;
+  } else {
+    // Redirect to signup if no email
+    window.location.href = '{{ url_for("auth.signup") }}';
+  }
+
+  // Auto-format confirmation code input
+  document
+    .getElementById("confirmationCode")
+    .addEventListener("input", function (e) {
+      let value = e.target.value.replace(/[^0-9]/g, "");
+      if (value.length > 6) value = value.slice(0, 6);
+      e.target.value = value;
+    });
+
+  // Form submission
+  document
+    .getElementById("confirmForm")
+    .addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const submitBtn = document.getElementById("submitBtn");
+      const submitText = document.getElementById("submitText");
+      const submitSpinner = document.getElementById("submitSpinner");
+
+      // Show loading state
+      submitBtn.disabled = true;
+      submitText.textContent = "Confirming...";
+      submitSpinner.classList.remove("hidden");
+
+      // Get form data
+      const formData = new FormData(this);
+
+      // Submit form
+      fetch('{{ url_for("auth.confirm") }}', {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            // Show success message and redirect
+            alert("Account confirmed successfully! You can now sign in.");
+            window.location.href = '{{ url_for("auth.login") }}';
+          } else {
+            // Show error
+            alert(data.error || "Confirmation failed. Please check your code.");
+
+            // Reset button
+            submitBtn.disabled = false;
+            submitText.textContent = "Confirm Account";
+            submitSpinner.classList.add("hidden");
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          alert("An error occurred. Please try again.");
+
+          // Reset button
+          submitBtn.disabled = false;
+          submitText.textContent = "Confirm Account";
+          submitSpinner.classList.add("hidden");
+        });
+    });
+
+  // Resend code functionality
+  function resendCode() {
+    const resendBtn = document.getElementById("resendBtn");
+    const resendTimer = document.getElementById("resendTimer");
+    const countdown = document.getElementById("countdown");
+
+    if (!email) {
+      alert("Email address not found. Please go back to signup.");
+      return;
+    }
+
+    // Disable resend button and show timer
+    resendBtn.disabled = true;
+    resendBtn.style.opacity = "0.5";
+    resendTimer.classList.remove("hidden");
+
+    // Start countdown
+    let timeLeft = 60;
+    const timer = setInterval(() => {
+      timeLeft--;
+      countdown.textContent = timeLeft;
+
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        resendBtn.disabled = false;
+        resendBtn.style.opacity = "1";
+        resendTimer.classList.add("hidden");
+      }
+    }, 1000);
+
+    // Send resend request
+    fetch('{{ url_for("auth.resend_code") }}', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: `email=${encodeURIComponent(email)}`,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          alert("New confirmation code sent to your email!");
+        } else {
+          alert(data.error || "Failed to resend code. Please try again.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        alert("An error occurred while resending the code.");
+      });
+  }
+</script>
+{% endblock %}

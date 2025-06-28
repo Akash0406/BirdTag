@@ -1,0 +1,481 @@
+{% extends "base.html" %} {% block title %}Dashboard - BirdTag{% endblock %} {%
+block content %}
+<div class="max-w-7xl mx-auto px-6 py-8">
+  <!-- Welcome Header -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">
+          Welcome back, {{ session.user.given_name or 'Researcher' }}!
+          <span class="inline-block animate-float">🐦</span>
+        </h1>
+        <p class="text-gray-600">
+          Ready to explore and organize your bird media collection?
+        </p>
+      </div>
+      <div class="hidden md:block">
+        <div class="bird-gradient p-3 rounded-xl shadow-lg">
+          <i data-lucide="bird" class="w-8 h-8 text-white"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Overview -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div
+      class="glass-effect rounded-xl p-6 hover:shadow-lg transition-all duration-200"
+    >
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-gray-600 text-sm font-medium">Total Files</p>
+          <p class="text-2xl font-bold text-gray-900">247</p>
+        </div>
+        <div
+          class="w-12 h-12 bg-bird-100 rounded-full flex items-center justify-center"
+        >
+          <i data-lucide="image" class="w-6 h-6 text-bird-600"></i>
+        </div>
+      </div>
+      <div class="mt-2 flex items-center text-sm">
+        <span class="text-green-600 font-medium">+12</span>
+        <span class="text-gray-500 ml-1">this week</span>
+      </div>
+    </div>
+
+    <div
+      class="glass-effect rounded-xl p-6 hover:shadow-lg transition-all duration-200"
+    >
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-gray-600 text-sm font-medium">Species Detected</p>
+          <p class="text-2xl font-bold text-gray-900">89</p>
+        </div>
+        <div
+          class="w-12 h-12 bg-nature-100 rounded-full flex items-center justify-center"
+        >
+          <i data-lucide="eye" class="w-6 h-6 text-nature-600"></i>
+        </div>
+      </div>
+      <div class="mt-2 flex items-center text-sm">
+        <span class="text-green-600 font-medium">+3</span>
+        <span class="text-gray-500 ml-1">new species</span>
+      </div>
+    </div>
+
+    <div
+      class="glass-effect rounded-xl p-6 hover:shadow-lg transition-all duration-200"
+    >
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-gray-600 text-sm font-medium">Storage Used</p>
+          <p class="text-2xl font-bold text-gray-900">2.4GB</p>
+        </div>
+        <div
+          class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center"
+        >
+          <i data-lucide="hard-drive" class="w-6 h-6 text-purple-600"></i>
+        </div>
+      </div>
+      <div class="mt-2 flex items-center text-sm">
+        <span class="text-gray-500">of 10GB limit</span>
+      </div>
+    </div>
+
+    <div
+      class="glass-effect rounded-xl p-6 hover:shadow-lg transition-all duration-200"
+    >
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-gray-600 text-sm font-medium">Recent Activity</p>
+          <p class="text-2xl font-bold text-gray-900">Active</p>
+        </div>
+        <div
+          class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center"
+        >
+          <i data-lucide="activity" class="w-6 h-6 text-green-600"></i>
+        </div>
+      </div>
+      <div class="mt-2 flex items-center text-sm">
+        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></div>
+        <span class="text-green-600">Online now</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Left Column - User Profile & Quick Actions -->
+    <div class="lg:col-span-1 space-y-6">
+      <!-- User Profile Card -->
+      <div class="glass-effect rounded-xl p-6">
+        <div class="text-center">
+          <div
+            class="w-20 h-20 bg-gradient-to-r from-bird-400 to-bird-600 rounded-full mx-auto mb-4 flex items-center justify-center"
+          >
+            <span class="text-white text-2xl font-bold">
+              {{ session.user.given_name[0] if session.user.given_name else
+              session.user.email[0] }}
+            </span>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900">
+            {{ session.user.given_name }} {{ session.user.family_name }}
+          </h3>
+          <p class="text-gray-600 text-sm">{{ session.user.email }}</p>
+          <p class="text-bird-600 text-sm font-medium mt-1">
+            Bird Research Specialist
+          </p>
+        </div>
+
+        <div class="mt-6 space-y-3">
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-gray-600">Specialized Species:</span>
+            <span class="font-medium text-gray-900">Raptors, Songbirds</span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-gray-600">Role:</span>
+            <span class="font-medium text-gray-900">Student Researcher</span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-gray-600">Institute:</span>
+            <span class="font-medium text-gray-900">Monash University</span>
+          </div>
+        </div>
+
+        <div class="mt-6">
+          <a
+            href="{{ url_for('main.profile') }}"
+            class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
+          >
+            <i data-lucide="user" class="w-4 h-4"></i>
+            <span>View Profile</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="glass-effect rounded-xl p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+          <i data-lucide="zap" class="w-5 h-5 mr-2 text-bird-600"></i>
+          Quick Actions
+        </h3>
+        <div class="space-y-3">
+          <a
+            href="{{ url_for('main.upload') }}"
+            class="w-full bird-gradient text-white py-3 px-4 rounded-lg hover:opacity-90 transition-all duration-200 flex items-center space-x-3"
+          >
+            <i data-lucide="upload" class="w-5 h-5"></i>
+            <span>Upload New Media</span>
+          </a>
+          <a
+            href="{{ url_for('main.search') }}"
+            class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-lg transition-colors duration-200 flex items-center space-x-3"
+          >
+            <i data-lucide="search" class="w-5 h-5"></i>
+            <span>Search Collection</span>
+          </a>
+          <a
+            href="{{ url_for('main.subscribe') }}"
+            class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-lg transition-colors duration-200 flex items-center space-x-3"
+          >
+            <i data-lucide="bell" class="w-5 h-5"></i>
+            <span>Manage Notifications</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column - Recent Activity & Species Summary -->
+    <div class="lg:col-span-2 space-y-6">
+      <!-- Recent Uploads -->
+      <div class="glass-effect rounded-xl p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+            <i data-lucide="clock" class="w-5 h-5 mr-2 text-bird-600"></i>
+            Recent Uploads
+          </h3>
+          <a
+            href="{{ url_for('main.search') }}"
+            class="text-bird-600 hover:text-bird-700 text-sm font-medium"
+            >View All</a
+          >
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="group cursor-pointer">
+            <div
+              class="aspect-square bg-gradient-to-br from-bird-100 to-bird-200 rounded-lg mb-2 flex items-center justify-center group-hover:scale-105 transition-transform duration-200"
+            >
+              <i data-lucide="image" class="w-8 h-8 text-bird-600"></i>
+            </div>
+            <p class="text-xs text-gray-600 text-center">Cardinal_2024.jpg</p>
+            <p class="text-xs text-bird-600 text-center font-medium">
+              2 species detected
+            </p>
+          </div>
+          <div class="group cursor-pointer">
+            <div
+              class="aspect-square bg-gradient-to-br from-nature-100 to-nature-200 rounded-lg mb-2 flex items-center justify-center group-hover:scale-105 transition-transform duration-200"
+            >
+              <i data-lucide="video" class="w-8 h-8 text-nature-600"></i>
+            </div>
+            <p class="text-xs text-gray-600 text-center">Eagle_hunt.mp4</p>
+            <p class="text-xs text-nature-600 text-center font-medium">
+              1 species detected
+            </p>
+          </div>
+          <div class="group cursor-pointer">
+            <div
+              class="aspect-square bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg mb-2 flex items-center justify-center group-hover:scale-105 transition-transform duration-200"
+            >
+              <i data-lucide="music" class="w-8 h-8 text-purple-600"></i>
+            </div>
+            <p class="text-xs text-gray-600 text-center">Sparrow_call.wav</p>
+            <p class="text-xs text-purple-600 text-center font-medium">
+              1 species detected
+            </p>
+          </div>
+          <div class="group cursor-pointer">
+            <div
+              class="aspect-square bg-gradient-to-br from-orange-100 to-orange-200 rounded-lg mb-2 flex items-center justify-center group-hover:scale-105 transition-transform duration-200"
+            >
+              <i data-lucide="image" class="w-8 h-8 text-orange-600"></i>
+            </div>
+            <p class="text-xs text-gray-600 text-center">Robin_nest.jpg</p>
+            <p class="text-xs text-orange-600 text-center font-medium">
+              3 species detected
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Species This Month -->
+      <div class="glass-effect rounded-xl p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+            <i
+              data-lucide="trending-up"
+              class="w-5 h-5 mr-2 text-nature-600"
+            ></i>
+            Top Species This Month
+          </h3>
+          <span class="text-sm text-gray-500">March 2025</span>
+        </div>
+
+        <div class="space-y-4">
+          <div
+            class="flex items-center justify-between p-3 bg-bird-50 rounded-lg"
+          >
+            <div class="flex items-center space-x-3">
+              <div
+                class="w-10 h-10 bg-bird-600 rounded-full flex items-center justify-center"
+              >
+                <span class="text-white font-bold text-sm">1</span>
+              </div>
+              <div>
+                <p class="font-medium text-gray-900">Northern Cardinal</p>
+                <p class="text-sm text-gray-600">Cardinalis cardinalis</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="font-bold text-bird-600">47 files</p>
+              <p class="text-xs text-gray-500">↑ 23% from last month</p>
+            </div>
+          </div>
+
+          <div
+            class="flex items-center justify-between p-3 bg-nature-50 rounded-lg"
+          >
+            <div class="flex items-center space-x-3">
+              <div
+                class="w-10 h-10 bg-nature-600 rounded-full flex items-center justify-center"
+              >
+                <span class="text-white font-bold text-sm">2</span>
+              </div>
+              <div>
+                <p class="font-medium text-gray-900">American Robin</p>
+                <p class="text-sm text-gray-600">Turdus migratorius</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="font-bold text-nature-600">32 files</p>
+              <p class="text-xs text-gray-500">↑ 15% from last month</p>
+            </div>
+          </div>
+
+          <div
+            class="flex items-center justify-between p-3 bg-purple-50 rounded-lg"
+          >
+            <div class="flex items-center space-x-3">
+              <div
+                class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center"
+              >
+                <span class="text-white font-bold text-sm">3</span>
+              </div>
+              <div>
+                <p class="font-medium text-gray-900">Blue Jay</p>
+                <p class="text-sm text-gray-600">Cyanocitta cristata</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="font-bold text-purple-600">28 files</p>
+              <p class="text-xs text-gray-500">↓ 5% from last month</p>
+            </div>
+          </div>
+
+          <div
+            class="flex items-center justify-between p-3 bg-orange-50 rounded-lg"
+          >
+            <div class="flex items-center space-x-3">
+              <div
+                class="w-10 h-10 bg-orange-600 rounded-full flex items-center justify-center"
+              >
+                <span class="text-white font-bold text-sm">4</span>
+              </div>
+              <div>
+                <p class="font-medium text-gray-900">House Sparrow</p>
+                <p class="text-sm text-gray-600">Passer domesticus</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="font-bold text-orange-600">19 files</p>
+              <p class="text-xs text-gray-500">↑ 8% from last month</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity Feed -->
+      <div class="glass-effect rounded-xl p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+            <i data-lucide="activity" class="w-5 h-5 mr-2 text-bird-600"></i>
+            Recent Activity
+          </h3>
+          <a
+            href="{{ url_for('main.feed') }}"
+            class="text-bird-600 hover:text-bird-700 text-sm font-medium"
+            >View Feed</a
+          >
+        </div>
+
+        <div class="space-y-4">
+          <div
+            class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors duration-200"
+          >
+            <div
+              class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="upload" class="w-4 h-4 text-green-600"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm text-gray-900">
+                You uploaded
+                <span class="font-medium">Cardinal_morning.jpg</span>
+              </p>
+              <p class="text-xs text-gray-500">
+                2 hours ago • AI detected: Northern Cardinal
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors duration-200"
+          >
+            <div
+              class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="eye" class="w-4 h-4 text-blue-600"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm text-gray-900">
+                AI analysis completed for
+                <span class="font-medium">Eagle_flight.mp4</span>
+              </p>
+              <p class="text-xs text-gray-500">
+                5 hours ago • Species: Bald Eagle
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors duration-200"
+          >
+            <div
+              class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="bell" class="w-4 h-4 text-purple-600"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm text-gray-900">
+                New notification preferences saved
+              </p>
+              <p class="text-xs text-gray-500">
+                Yesterday • Subscribed to Raptor updates
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors duration-200"
+          >
+            <div
+              class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <i data-lucide="users" class="w-4 h-4 text-orange-600"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm text-gray-900">
+                Dr. Sarah Chen shared research data with you
+              </p>
+              <p class="text-xs text-gray-500">
+                2 days ago • Migratory patterns study
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Sidebar (Mobile) -->
+  <div class="fixed bottom-6 right-6 md:hidden">
+    <div class="flex flex-col space-y-3">
+      <a
+        href="{{ url_for('main.upload') }}"
+        class="w-14 h-14 bird-gradient rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200"
+      >
+        <i data-lucide="upload" class="w-6 h-6 text-white"></i>
+      </a>
+      <a
+        href="{{ url_for('main.search') }}"
+        class="w-12 h-12 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200"
+      >
+        <i data-lucide="search" class="w-5 h-5 text-gray-600"></i>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Initialize dashboard
+  document.addEventListener("DOMContentLoaded", function () {
+    // Animate stats on load
+    const stats = document.querySelectorAll(".glass-effect");
+    stats.forEach((stat, index) => {
+      setTimeout(() => {
+        stat.style.animation = "slideUp 0.5s ease-out";
+      }, index * 100);
+    });
+
+    // Update last activity time
+    updateActivityTime();
+    setInterval(updateActivityTime, 60000); // Update every minute
+  });
+
+  function updateActivityTime() {
+    // This would typically fetch real data from your API
+    console.log("Activity time updated");
+  }
+</script>
+{% endblock %}

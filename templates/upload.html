@@ -1,0 +1,593 @@
+{% extends "base.html" %} {% block title %}Upload Media - BirdTag{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto px-6 py-8">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center space-x-4">
+      <a
+        href="{{ url_for('main_dashboard') }}"
+        class="text-gray-500 hover:text-gray-700"
+      >
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+      </a>
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Upload Bird Media</h1>
+        <p class="text-gray-600">
+          Upload your bird photos, videos, and audio recordings for AI analysis
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload Options -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div class="glass-effect rounded-xl p-6">
+      <div class="text-center">
+        <div
+          class="w-16 h-16 bg-bird-100 rounded-full flex items-center justify-center mx-auto mb-4"
+        >
+          <i data-lucide="cloud-upload" class="w-8 h-8 text-bird-600"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">
+          Upload to Cloud Storage
+        </h3>
+        <p class="text-gray-600 mb-4">
+          Permanently store your files in AWS S3 with automatic AI tagging
+        </p>
+        <button
+          onclick="setUploadMode('storage')"
+          class="bird-gradient text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-all duration-200"
+        >
+          Choose Files for Storage
+        </button>
+      </div>
+    </div>
+
+    <div class="glass-effect rounded-xl p-6">
+      <div class="text-center">
+        <div
+          class="w-16 h-16 bg-nature-100 rounded-full flex items-center justify-center mx-auto mb-4"
+        >
+          <i data-lucide="eye" class="w-8 h-8 text-nature-600"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Analysis Only</h3>
+        <p class="text-gray-600 mb-4">
+          Analyze files without storing them - perfect for quick identification
+        </p>
+        <button
+          onclick="setUploadMode('analysis')"
+          class="nature-gradient text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-all duration-200"
+        >
+          Choose Files for Analysis
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload Area -->
+  <div class="glass-effect rounded-xl p-8 mb-6">
+    <div
+      id="uploadArea"
+      class="border-2 border-dashed border-gray-300 rounded-xl p-12 text-center transition-all duration-200 hover:border-bird-400 hover:bg-bird-50"
+    >
+      <div class="animate-float mb-6">
+        <i
+          data-lucide="upload-cloud"
+          class="w-16 h-16 text-gray-400 mx-auto"
+        ></i>
+      </div>
+      <h3 class="text-xl font-semibold text-gray-700 mb-2">
+        Drop files here or click to browse
+      </h3>
+      <p class="text-gray-500 mb-4">
+        Supports JPG, PNG, MP4, MOV, WAV, MP3 files up to 100MB each
+      </p>
+      <input
+        type="file"
+        id="fileInput"
+        class="hidden"
+        multiple
+        accept="image/*,video/*,audio/*"
+      />
+      <button
+        onclick="document.getElementById('fileInput').click()"
+        class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors duration-200"
+      >
+        Browse Files
+      </button>
+      <p class="text-xs text-gray-400 mt-4">Maximum 10 files per upload</p>
+    </div>
+  </div>
+
+  <!-- File Preview Area -->
+  <div id="filePreviewArea" class="hidden mb-6">
+    <div class="glass-effect rounded-xl p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-900">Selected Files</h3>
+        <button
+          onclick="clearFiles()"
+          class="text-red-600 hover:text-red-700 text-sm font-medium"
+        >
+          Clear All
+        </button>
+      </div>
+      <div id="fileList" class="space-y-3"></div>
+    </div>
+  </div>
+
+  <!-- Upload Settings -->
+  <div id="uploadSettings" class="hidden mb-6">
+    <div class="glass-effect rounded-xl p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Upload Settings</h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Upload Mode</label
+          >
+          <div class="space-y-2">
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="uploadMode"
+                value="storage"
+                class="text-bird-600 focus:ring-bird-500"
+                checked
+              />
+              <span class="ml-2 text-sm text-gray-700"
+                >Store in cloud (permanent)</span
+              >
+            </label>
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="uploadMode"
+                value="analysis"
+                class="text-bird-600 focus:ring-bird-500"
+              />
+              <span class="ml-2 text-sm text-gray-700"
+                >Analysis only (temporary)</span
+              >
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Privacy Settings</label
+          >
+          <div class="space-y-2">
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="privacy"
+                value="private"
+                class="text-bird-600 focus:ring-bird-500"
+                checked
+              />
+              <span class="ml-2 text-sm text-gray-700"
+                >Private (only you can see)</span
+              >
+            </label>
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="privacy"
+                value="public"
+                class="text-bird-600 focus:ring-bird-500"
+              />
+              <span class="ml-2 text-sm text-gray-700"
+                >Public (visible in community feed)</span
+              >
+            </label>
+          </div>
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Description (Optional)</label
+          >
+          <textarea
+            placeholder="Add a description for your upload batch..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-bird-500 focus:border-transparent resize-none"
+            rows="3"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload Button -->
+  <div id="uploadButton" class="hidden text-center">
+    <button
+      onclick="startUpload()"
+      class="bird-gradient text-white px-8 py-4 rounded-xl font-semibold hover:opacity-90 transition-all duration-200 transform hover:scale-105 shadow-lg"
+    >
+      <i data-lucide="upload" class="w-5 h-5 inline mr-2"></i>
+      Start Upload & Analysis
+    </button>
+  </div>
+
+  <!-- Upload Progress -->
+  <div id="uploadProgress" class="hidden">
+    <div class="glass-effect rounded-xl p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-gray-900">Upload Progress</h3>
+        <span id="progressText" class="text-sm text-gray-600">0% complete</span>
+      </div>
+
+      <div class="w-full bg-gray-200 rounded-full h-3 mb-4">
+        <div
+          id="progressBar"
+          class="bird-gradient h-3 rounded-full transition-all duration-300"
+          style="width: 0%"
+        ></div>
+      </div>
+
+      <div id="uploadStatusList" class="space-y-2"></div>
+    </div>
+  </div>
+
+  <!-- Recent Uploads -->
+  <div class="mt-8">
+    <div class="glass-effect rounded-xl p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-semibold text-gray-900">Recent Uploads</h3>
+        <a
+          href="{{ url_for('main_search') }}"
+          class="text-bird-600 hover:text-bird-700 text-sm font-medium"
+          >View All</a
+        >
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <div class="group cursor-pointer">
+          <div
+            class="aspect-square bg-gradient-to-br from-bird-100 to-bird-200 rounded-lg mb-2 flex items-center justify-center group-hover:scale-105 transition-transform duration-200"
+          >
+            <i data-lucide="image" class="w-8 h-8 text-bird-600"></i>
+          </div>
+          <p class="text-xs text-gray-600 text-center truncate">
+            cardinal_001.jpg
+          </p>
+          <p class="text-xs text-green-600 text-center font-medium">
+            ✓ Analyzed
+          </p>
+        </div>
+
+        <div class="group cursor-pointer">
+          <div
+            class="aspect-square bg-gradient-to-br from-nature-100 to-nature-200 rounded-lg mb-2 flex items-center justify-center group-hover:scale-105 transition-transform duration-200"
+          >
+            <i data-lucide="video" class="w-8 h-8 text-nature-600"></i>
+          </div>
+          <p class="text-xs text-gray-600 text-center truncate">
+            eagle_flight.mp4
+          </p>
+          <p class="text-xs text-green-600 text-center font-medium">
+            ✓ Analyzed
+          </p>
+        </div>
+
+        <div class="group cursor-pointer">
+          <div
+            class="aspect-square bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg mb-2 flex items-center justify-center group-hover:scale-105 transition-transform duration-200"
+          >
+            <i data-lucide="music" class="w-8 h-8 text-purple-600"></i>
+          </div>
+          <p class="text-xs text-gray-600 text-center truncate">
+            robin_song.wav
+          </p>
+          <p class="text-xs text-yellow-600 text-center font-medium">
+            ⏳ Processing
+          </p>
+        </div>
+
+        <div class="group cursor-pointer">
+          <div
+            class="aspect-square bg-gradient-to-br from-orange-100 to-orange-200 rounded-lg mb-2 flex items-center justify-center group-hover:scale-105 transition-transform duration-200"
+          >
+            <i data-lucide="image" class="w-8 h-8 text-orange-600"></i>
+          </div>
+          <p class="text-xs text-gray-600 text-center truncate">
+            sparrow_nest.jpg
+          </p>
+          <p class="text-xs text-green-600 text-center font-medium">
+            ✓ Analyzed
+          </p>
+        </div>
+
+        <div class="group cursor-pointer">
+          <div
+            class="aspect-square bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg mb-2 flex items-center justify-center group-hover:scale-105 transition-transform duration-200"
+          >
+            <i data-lucide="image" class="w-8 h-8 text-blue-600"></i>
+          </div>
+          <p class="text-xs text-gray-600 text-center truncate">
+            heron_pond.jpg
+          </p>
+          <p class="text-xs text-green-600 text-center font-medium">
+            ✓ Analyzed
+          </p>
+        </div>
+
+        <div class="group cursor-pointer">
+          <div
+            class="aspect-square bg-gradient-to-br from-pink-100 to-pink-200 rounded-lg mb-2 flex items-center justify-center group-hover:scale-105 transition-transform duration-200"
+          >
+            <i data-lucide="video" class="w-8 h-8 text-pink-600"></i>
+          </div>
+          <p class="text-xs text-gray-600 text-center truncate">
+            finch_feeding.mp4
+          </p>
+          <p class="text-xs text-green-600 text-center font-medium">
+            ✓ Analyzed
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let selectedFiles = [];
+  let uploadMode = "storage";
+
+  // Drag and drop functionality
+  const uploadArea = document.getElementById("uploadArea");
+  const fileInput = document.getElementById("fileInput");
+
+  uploadArea.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    uploadArea.classList.add("border-bird-500", "bg-bird-50");
+  });
+
+  uploadArea.addEventListener("dragleave", (e) => {
+    e.preventDefault();
+    uploadArea.classList.remove("border-bird-500", "bg-bird-50");
+  });
+
+  uploadArea.addEventListener("drop", (e) => {
+    e.preventDefault();
+    uploadArea.classList.remove("border-bird-500", "bg-bird-50");
+    const files = Array.from(e.dataTransfer.files);
+    handleFileSelection(files);
+  });
+
+  uploadArea.addEventListener("click", () => {
+    fileInput.click();
+  });
+
+  fileInput.addEventListener("change", (e) => {
+    const files = Array.from(e.target.files);
+    handleFileSelection(files);
+  });
+
+  function setUploadMode(mode) {
+    uploadMode = mode;
+    document.querySelector(`input[value="${mode}"]`).checked = true;
+
+    // Update UI to reflect mode
+    const storageBtn = document.querySelector(
+      "button[onclick=\"setUploadMode('storage')\"]"
+    );
+    const analysisBtn = document.querySelector(
+      "button[onclick=\"setUploadMode('analysis')\"]"
+    );
+
+    if (mode === "storage") {
+      storageBtn.classList.add("bird-gradient");
+      storageBtn.classList.remove("bg-gray-100", "text-gray-700");
+      analysisBtn.classList.remove("nature-gradient");
+      analysisBtn.classList.add("bg-gray-100", "text-gray-700");
+    } else {
+      analysisBtn.classList.add("nature-gradient");
+      analysisBtn.classList.remove("bg-gray-100", "text-gray-700");
+      storageBtn.classList.remove("bird-gradient");
+      storageBtn.classList.add("bg-gray-100", "text-gray-700");
+    }
+  }
+
+  function handleFileSelection(files) {
+    // Validate file types and sizes
+    const validFiles = files.filter((file) => {
+      const validTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/jpg",
+        "video/mp4",
+        "video/mov",
+        "audio/wav",
+        "audio/mp3",
+      ];
+      const maxSize = 100 * 1024 * 1024; // 100MB
+
+      if (!validTypes.includes(file.type)) {
+        alert(`${file.name} is not a supported file type.`);
+        return false;
+      }
+
+      if (file.size > maxSize) {
+        alert(`${file.name} is too large. Maximum size is 100MB.`);
+        return false;
+      }
+
+      return true;
+    });
+
+    if (validFiles.length === 0) return;
+
+    // Limit to 10 files
+    if (selectedFiles.length + validFiles.length > 10) {
+      alert("Maximum 10 files allowed per upload.");
+      return;
+    }
+
+    selectedFiles = [...selectedFiles, ...validFiles];
+    updateFilePreview();
+    showUploadControls();
+  }
+
+  function updateFilePreview() {
+    const fileList = document.getElementById("fileList");
+    const filePreviewArea = document.getElementById("filePreviewArea");
+
+    if (selectedFiles.length === 0) {
+      filePreviewArea.classList.add("hidden");
+      return;
+    }
+
+    filePreviewArea.classList.remove("hidden");
+    fileList.innerHTML = "";
+
+    selectedFiles.forEach((file, index) => {
+      const fileItem = document.createElement("div");
+      fileItem.className =
+        "flex items-center justify-between p-3 bg-gray-50 rounded-lg";
+
+      const fileIcon = getFileIcon(file.type);
+      const fileSize = formatFileSize(file.size);
+
+      fileItem.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-r ${fileIcon.gradient} rounded-lg flex items-center justify-center">
+                        <i data-lucide="${fileIcon.icon}" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium text-gray-900">${file.name}</p>
+                        <p class="text-sm text-gray-500">${fileSize} • ${file.type}</p>
+                    </div>
+                </div>
+                <button onclick="removeFile(${index})" class="text-red-600 hover:text-red-700 p-1">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            `;
+
+      fileList.appendChild(fileItem);
+    });
+
+    // Re-initialize Lucide icons
+    lucide.createIcons();
+  }
+
+  function getFileIcon(fileType) {
+    if (fileType.startsWith("image/")) {
+      return { icon: "image", gradient: "from-bird-400 to-bird-600" };
+    } else if (fileType.startsWith("video/")) {
+      return { icon: "video", gradient: "from-nature-400 to-nature-600" };
+    } else if (fileType.startsWith("audio/")) {
+      return { icon: "music", gradient: "from-purple-400 to-purple-600" };
+    }
+    return { icon: "file", gradient: "from-gray-400 to-gray-600" };
+  }
+
+  function formatFileSize(bytes) {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  }
+
+  function removeFile(index) {
+    selectedFiles.splice(index, 1);
+    updateFilePreview();
+
+    if (selectedFiles.length === 0) {
+      hideUploadControls();
+    }
+  }
+
+  function clearFiles() {
+    selectedFiles = [];
+    updateFilePreview();
+    hideUploadControls();
+  }
+
+  function showUploadControls() {
+    document.getElementById("uploadSettings").classList.remove("hidden");
+    document.getElementById("uploadButton").classList.remove("hidden");
+  }
+
+  function hideUploadControls() {
+    document.getElementById("uploadSettings").classList.add("hidden");
+    document.getElementById("uploadButton").classList.add("hidden");
+  }
+
+  function startUpload() {
+    if (selectedFiles.length === 0) {
+      alert("Please select files to upload.");
+      return;
+    }
+
+    // Hide upload controls and show progress
+    hideUploadControls();
+    document.getElementById("filePreviewArea").classList.add("hidden");
+    document.getElementById("uploadProgress").classList.remove("hidden");
+
+    // Simulate upload progress
+    simulateUpload();
+  }
+
+  function simulateUpload() {
+    const progressBar = document.getElementById("progressBar");
+    const progressText = document.getElementById("progressText");
+    const statusList = document.getElementById("uploadStatusList");
+
+    let progress = 0;
+    const totalFiles = selectedFiles.length;
+    let currentFile = 0;
+
+    const interval = setInterval(() => {
+      progress += Math.random() * 10;
+      if (progress > 100) progress = 100;
+
+      progressBar.style.width = progress + "%";
+      progressText.textContent = Math.round(progress) + "% complete";
+
+      // Add file status updates
+      if (
+        progress > (currentFile + 1) * (100 / totalFiles) &&
+        currentFile < totalFiles
+      ) {
+        const fileName = selectedFiles[currentFile].name;
+        const statusItem = document.createElement("div");
+        statusItem.className = "flex items-center space-x-2 text-sm";
+        statusItem.innerHTML = `
+                    <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
+                    <span class="text-gray-700">${fileName} - Uploaded and analyzed</span>
+                `;
+        statusList.appendChild(statusItem);
+        currentFile++;
+        lucide.createIcons();
+      }
+
+      if (progress >= 100) {
+        clearInterval(interval);
+        setTimeout(() => {
+          alert("Upload completed successfully! All files have been analyzed.");
+          // Reset the form
+          resetUploadForm();
+        }, 1000);
+      }
+    }, 200);
+  }
+
+  function resetUploadForm() {
+    selectedFiles = [];
+    document.getElementById("uploadProgress").classList.add("hidden");
+    document.getElementById("filePreviewArea").classList.add("hidden");
+    document.getElementById("uploadSettings").classList.add("hidden");
+    document.getElementById("uploadButton").classList.add("hidden");
+    document.getElementById("fileInput").value = "";
+
+    // Reset progress
+    document.getElementById("progressBar").style.width = "0%";
+    document.getElementById("progressText").textContent = "0% complete";
+    document.getElementById("uploadStatusList").innerHTML = "";
+  }
+
+  // Initialize upload mode
+  setUploadMode("storage");
+</script>
+{% endblock %}">
